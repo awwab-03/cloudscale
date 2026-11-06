@@ -12,7 +12,7 @@ See `CLAUDE.md` for the full brief and `AI-DLC-LOG.md` for the build log.
 ## Status
 | Bolt | Phase | Status |
 |---|---|---|
-| 0 | Repo bootstrap | in progress |
+| 0 | Repo bootstrap | done |
 | 1 | Networking | planned |
 
 ## Setup / Deploy / Teardown
