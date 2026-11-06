@@ -26,3 +26,14 @@ Create the relational database for users, items and claims. It must be private (
 
 ### Open questions
 - None.
+
+## Construction — approved plan
+`infra/database.tf`: DB subnet group (private-DB subnets) + `db.t4g.micro` PostgreSQL 16.15, single-AZ, 20 GB gp3 encrypted, private, `manage_master_user_password = true`. Plan: 2 to add, 0 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-07.
+
+## Operations
+- **Built:** `cloudscale-db` (RDS PostgreSQL 16.15), subnet group `cloudscale-db-subnets`.
+- **Decisions:** password in RDS-managed Secrets Manager secret (ARN is a Terraform output, value never read); 1-day backups, no final snapshot, no deletion protection for easy teardown; no Free-plan block encountered.
+- **Verification (CLI):** status `available`; PubliclyAccessible=False; MultiAZ=False; gp3 20 GB; StorageEncrypted=True; in the CloudScale VPC; only `cloudscale-db-sg` attached; master secret status `active`.
+- **Not yet verified:** an actual connection from an app instance (happens in the app bolt, when the EC2 role can read the secret).
+- **Screenshots to take** (blur account ID, never reveal the password): `phase-4-rds-config.png` (Configuration tab: class, storage, Multi-AZ no), `phase-4-rds-connectivity.png` (Connectivity & security: Publicly accessible = No, security group, subnet group), `phase-4-secret.png` (Secrets Manager list showing the `rds!db-...` secret; do NOT click Retrieve secret value).

@@ -19,3 +19,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed two buckets with HTTPS-only policies and deferred CloudFront/SQS policies; human review: Awwab approved the plan (12 resources) unchanged
 - Operations: applied; verified BPA, versioning, encryption, lifecycle and policy via AWS CLI
 - Evidence screenshots: phase-3a-buckets-list.png, phase-3a-uploads-lifecycle.png, phase-3a-uploads-versioning-bpa.png
+
+## Bolt 4 — RDS PostgreSQL — 2026-11-07 PKT
+- Inception: private single-AZ Postgres with Secrets Manager password → docs/aidlc/phase-4-rds.md
+- Construction: AI proposed db.t4g.micro, gp3 20 GB, managed master password, 1-day backups; human review: Awwab approved the plan (2 resources) unchanged
+- Operations: applied; verified available, private, single-AZ, encrypted, correct security group via AWS CLI
+- Evidence screenshots: phase-4-rds-config.png, phase-4-rds-connectivity.png, phase-4-secret.png
