@@ -35,5 +35,5 @@ variable "private_db_subnet_cidrs" {
 
 variable "nat_instance_type" {
   type    = string
-  default = "t4g.nano"
+  default = "t4g.micro"
 }
