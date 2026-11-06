@@ -33,3 +33,11 @@ output "nat_instance_id" {
 output "nat_public_ip" {
   value = aws_eip.nat.public_ip
 }
+
+output "uploads_bucket" {
+  value = aws_s3_bucket.uploads.bucket
+}
+
+output "artifacts_bucket" {
+  value = aws_s3_bucket.artifacts.bucket
+}
