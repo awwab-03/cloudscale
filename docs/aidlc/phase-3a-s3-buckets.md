@@ -27,3 +27,13 @@ Create the two storage buckets the app needs: one for user photos (uploads) and 
 
 ### Open questions
 - None.
+
+## Construction — approved plan
+`infra/storage.tf`: uploads and artifacts buckets, each with Block Public Access, versioning, SSE-S3, lifecycle rules, HTTPS-only policy, `force_destroy`. Plan: 12 to add, 0 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-07.
+
+## Operations
+- **Built:** `cloudscale-uploads-<account>` and `cloudscale-artifacts-<account>`.
+- **Decisions:** SSE-S3 (no KMS cost or key policy); CloudFront OAC and S3→SQS policies deferred to their own bolts; separate artifacts bucket so IAM can be scoped per prefix.
+- **Verification (CLI):** both buckets have all four Block Public Access flags true, versioning Enabled, AES256 encryption, DenyInsecureTransport policy; uploads lifecycle has originals-tiering (30d STANDARD_IA, 90d GLACIER_IR), noncurrent expiry and multipart abort; artifacts has the latter two.
+- **Screenshots to take** (blur account ID): `phase-3a-buckets-list.png`, `phase-3a-uploads-lifecycle.png` (Management tab), `phase-3a-uploads-versioning-bpa.png` (Properties + Permissions showing Block Public Access on).

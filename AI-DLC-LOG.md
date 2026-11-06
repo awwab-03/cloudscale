@@ -13,3 +13,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed t4g.nano NAT instance; human review: apply hit a Free-plan block, Awwab approved t4g.micro instead (no plan upgrade)
 - Operations: applied in two steps (38 + 4 resources); verified via AWS CLI (NAT running, source/dest check off, SSM online, routes and SG rules correct)
 - Evidence screenshots: phase-1-vpc-resource-map.png, phase-1-route-tables.png, phase-1-security-groups.png, phase-1-nat-instance.png
+
+## Bolt 3a — S3 buckets — 2026-11-07 PKT
+- Inception: uploads and artifacts buckets, lifecycle, versioning, BPA → docs/aidlc/phase-3a-s3-buckets.md
+- Construction: AI proposed two buckets with HTTPS-only policies and deferred CloudFront/SQS policies; human review: Awwab approved the plan (12 resources) unchanged
+- Operations: applied; verified BPA, versioning, encryption, lifecycle and policy via AWS CLI
+- Evidence screenshots: phase-3a-buckets-list.png, phase-3a-uploads-lifecycle.png, phase-3a-uploads-versioning-bpa.png
