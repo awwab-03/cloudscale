@@ -1,0 +1,22 @@
+# CloudScale — Campus Lost & Found on AWS
+
+CS-4075 Cloud Computing semester project, FAST-NUCES Islamabad.
+Team: Awwab Aamir (22i-0971), Rayyan Khan (22i-1002).
+
+A Flask app where students post lost/found items, search, and claim items,
+running on AWS (VPC, EC2 ASG + ALB, CloudFront, RDS, S3, SQS/Lambda, SNS,
+Cognito, SageMaker, Bedrock, CloudWatch, Route 53). Region: us-east-1.
+
+See `CLAUDE.md` for the full brief and `AI-DLC-LOG.md` for the build log.
+
+## Status
+| Bolt | Phase | Status |
+|---|---|---|
+| 0 | Repo bootstrap | in progress |
+| 1 | Networking | planned |
+
+## Setup / Deploy / Teardown
+_To be filled in as phases complete._
+
+## Safety
+No secrets are committed. `*.tfstate*`, `*.tfvars`, `.env*`, and `*.pem` are gitignored.
