@@ -24,3 +24,16 @@ Build the private network the whole app will live in: a VPC with public, private
 
 ### Open questions
 - None blocking. Test instance for the NAT check needs Awwab's OK before launching.
+
+## Construction — approved plan
+Terraform in `infra/`: VPC 10.20.0.0/16, 6 subnets over 2 AZs, IGW, route tables, S3 gateway endpoint, 4 security groups, NAT instance + EIP + SSM-only IAM role.
+Plan 1: 39 to add. Apply created 38; the NAT instance was rejected (`t4g.nano` not Free-plan eligible). Stopped and reported per CLAUDE.md §2.6.
+Human decision: use `t4g.micro` (Free-plan eligible, ~$0.20/day from credit); no plan upgrade needed. Plan 2: 4 to add (NAT, EIP, 2 routes).
+Approved by Awwab Aamir, 2026-11-07 (both applies approved in chat).
+
+## Operations
+- **Built:** VPC and subnets, IGW, NAT instance (`t4g.micro`, source/dest check off, EIP), S3 gateway endpoint, alb/app/db/nat security groups.
+- **Decisions:** AL2023 + iptables NAT (no marketplace AMI); NAT size raised nano→micro due to Free-plan restriction; single NAT is a known single point of failure.
+- **Verification (CLI):** NAT `running`, SourceDestCheck=False, SSM PingStatus Online; both private-app route tables send 0.0.0.0/0 to the NAT ENI; DB route table has no default route; public route table → IGW; zero inbound 0.0.0.0/0 rules on alb/app/db SGs.
+- **Not yet verified:** actual outbound internet from a private instance (needs a temporary instance, pending approval; will happen naturally when the ASG launches in Bolt 2).
+- **Screenshots to take** (`docs/screenshots/`, blur account ID, never show keys): `phase-1-vpc-resource-map.png`, `phase-1-route-tables.png`, `phase-1-security-groups.png`, `phase-1-nat-instance.png`.
