@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Sign in - CloudScale{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>Sign in</h2>
+  <form method="post">
+    <label>Email</label><input type="email" name="email" required>
+    <label>Password</label><input type="password" name="password" required>
+    <p><button>Sign in</button></p>
+  </form>
+  <p class="muted">No account? <a href="{{ url_for('signup') }}">Sign up</a> &middot;
+     <a href="{{ url_for('confirm') }}">Confirm email</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Sign up - CloudScale{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>Create an account</h2>
+  <form method="post">
+    <label>Display name</label><input name="name" required maxlength="60">
+    <label>Email</label><input type="email" name="email" required>
+    <label>Password</label><input type="password" name="password" required minlength="8">
+    <p class="muted">At least 8 characters with upper and lower case letters and a number.</p>
+    <p><button>Sign up</button></p>
+  </form>
+</div>
+{% endblock %}

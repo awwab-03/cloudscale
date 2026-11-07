@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} - CloudScale{% endblock %}
+{% block content %}
+<div class="card detail">
+  <p><span class="tag {{ item.kind }}">{{ item.kind }}</span> <span class="tag">{{ item.category }}</span>
+     <span class="tag">{{ item.status }}</span></p>
+  <h2>{{ item.title }}</h2>
+  {% if item.image_key %}<img src="{{ item.image_key | media }}" alt="{{ item.title }}">{% endif %}
+  {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+  {% if item.notes %}<p class="muted">Notes: {{ item.notes }}</p>{% endif %}
+  <p class="muted">Location: {{ item.location or '—' }} &middot; Date: {{ item.item_date or '—' }}
+     &middot; Posted by {{ item.owner_name }}</p>
+  {% if item.labels %}<p>{% for l in item.labels %}<span class="tag">{{ l }}</span> {% endfor %}</p>{% endif %}
+</div>
+
+{% if item.kind == 'found' and item.status == 'open' %}
+<div class="card" style="margin-top:1rem">
+  <h3>Is this yours?</h3>
+  {% if user %}
+    <form method="post" action="{{ url_for('claim_item', item_id=item.id) }}">
+      <label for="message">Message to the finder</label>
+      <textarea id="message" name="message" rows="3" placeholder="Describe something only the owner would know"></textarea>
+      <p><button>Claim this item</button></p>
+    </form>
+  {% else %}
+    <p><a href="{{ url_for('login', next=request.path) }}">Sign in</a> to claim it.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if claims %}
+<div class="card" style="margin-top:1rem">
+  <h3>Claims</h3>
+  {% for c in claims %}<p><strong>{{ c.claimant_name }}</strong>: {{ c.message or '(no message)' }}</p>{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

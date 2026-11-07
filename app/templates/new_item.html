@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Post an item - CloudScale{% endblock %}
+{% block content %}
+<div class="card narrow" style="max-width:640px">
+  <h2>Post an item</h2>
+  <form method="post" enctype="multipart/form-data">
+    <label>Type</label>
+    <select name="kind">
+      <option value="lost" {{ 'selected' if form.get('kind') == 'lost' }}>I lost something</option>
+      <option value="found" {{ 'selected' if form.get('kind') == 'found' }}>I found something</option>
+    </select>
+    <label>Title</label>
+    <input name="title" required maxlength="120" value="{{ form.get('title', '') }}">
+    <label>Quick notes</label>
+    <input name="notes" maxlength="300" placeholder="e.g. black wallet, near library" value="{{ form.get('notes', '') }}">
+    <label>Description</label>
+    <textarea name="description" rows="3">{{ form.get('description', '') }}</textarea>
+    <label>Category</label>
+    <select name="category">
+      {% for c in categories %}<option {{ 'selected' if c == form.get('category') }}>{{ c }}</option>{% endfor %}
+    </select>
+    <label>Location</label>
+    <input name="location" maxlength="120" value="{{ form.get('location', '') }}">
+    <label>Date</label>
+    <input type="date" name="item_date" value="{{ form.get('item_date', '') }}">
+    <label>Photo (jpg, png, webp, gif; max 5 MB)</label>
+    <input type="file" name="photo" accept="image/*">
+    <p><button>Post</button></p>
+  </form>
+</div>
+{% endblock %}

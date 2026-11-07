@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<form class="filters" method="get">
+  <input name="q" placeholder="Search title, notes, location…" value="{{ q }}">
+  <select name="kind">
+    <option value="">Lost &amp; found</option>
+    <option value="lost" {{ 'selected' if kind == 'lost' }}>Lost</option>
+    <option value="found" {{ 'selected' if kind == 'found' }}>Found</option>
+  </select>
+  <select name="category">
+    <option value="">All categories</option>
+    {% for c in categories %}<option {{ 'selected' if c == category }}>{{ c }}</option>{% endfor %}
+  </select>
+  <button>Search</button>
+</form>
+{% if not items %}
+  <p class="muted">No items yet. {% if user %}<a href="{{ url_for('new_item') }}">Post the first one.</a>{% else %}<a href="{{ url_for('signup') }}">Sign up</a> to post one.{% endif %}</p>
+{% endif %}
+<div class="grid">
+{% for i in items %}
+  <a class="card" href="{{ url_for('item_detail', item_id=i.id) }}" style="text-decoration:none;color:inherit">
+    {% if i.image_key %}<img src="{{ i.image_key | media }}" alt="{{ i.title }}" loading="lazy">{% endif %}
+    <p><span class="tag {{ i.kind }}">{{ i.kind }}</span> <span class="tag">{{ i.category }}</span>
+       {% if i.status != 'open' %}<span class="tag">{{ i.status }}</span>{% endif %}</p>
+    <strong>{{ i.title }}</strong>
+    <div class="muted">{{ i.location }}{% if i.item_date %} &middot; {{ i.item_date }}{% endif %}</div>
+  </a>
+{% endfor %}
+</div>
+{% endblock %}
