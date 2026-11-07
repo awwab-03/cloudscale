@@ -43,3 +43,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed boto3 training/deploy scripts and a least-privilege SageMaker role; human review: Awwab approved each step; training hit a 0 quota for ml.m5.large, Awwab approved ml.g5.xlarge (about $0.02) instead
 - Operations: trained (hold-out 0.9875 on synthetic data), endpoint InService (serverless), app 1.1.0 released by rolling refresh, 36 demo listings seeded; verified with endpoint invocations, Bedrock call and HTTP checks
 - Evidence screenshots: phase-10-training-job.png, phase-10-training-logs.png, phase-10-endpoint-serverless.png, phase-10-form-category-suggestion.png, phase-10-form-ai-description.png
+
+## Bolts 5+6 — Async images and notifications — 2026-11-07 PKT
+- Inception: S3 → SQS (+DLQ) → Lambda thumbnailer with Rekognition; SNS claim and ops topics → docs/aidlc/phase-5-6-async-notify.md
+- Construction: AI proposed meta/*.json handoff (Lambda cannot reach RDS) and serving thumbnails only; human review: Awwab approved the plan (12 add, 3 change) unchanged
+- Operations: applied; generated image became a thumbnail + labels in about 5 s; CloudFront serves the thumbnail (200) and refuses originals and meta (403); app 1.2.0 rolled out
+- Evidence screenshots: phase-5-sqs-queues.png, phase-5-s3-event-notification.png, phase-5-lambda-config.png, phase-5-s3-thumbnails-meta.png, phase-5-item-with-labels.png, phase-6-sns-topics.png, phase-6-claim-email.png

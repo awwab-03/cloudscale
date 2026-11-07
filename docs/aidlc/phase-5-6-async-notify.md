@@ -35,3 +35,18 @@ When someone uploads a photo, the website should answer immediately and a backgr
 
 ### Open questions
 - None.
+
+## Construction — approved plan
+Terraform: SQS `image-jobs` + DLQ (`maxReceiveCount` 3), queue policy for S3, S3 notification on `originals/`, Lambda `cloudscale-thumbnailer` + role + log group + event source mapping, SNS `claim-notifications` and `ops-alerts` (+ email subscription), bucket policy tightened to `thumbnails/*`. App 1.2.0 (thumbnails, labels, moderation state). Plan: 12 to add, 3 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-07 (upload app 1.2.0 and apply).
+
+## Operations
+- **Built:** queues, Lambda (python3.12, 512 MB, 60 s, no VPC), event source mapping (batch 5, partial failures), two SNS topics, app 1.2.0 via rolling refresh (Successful, 100%).
+- **Decisions:** Lambda writes `meta/*.json` (cannot reach RDS); app persists labels to `items.labels` on first item view; CloudFront serves thumbnails only, so originals, meta and flagged photos are never public; flagged photos get no thumbnail.
+- **Verification:**
+  - Uploaded a generated 1600x1200 JPEG to `originals/`: `thumbnails/*.jpg` (6.8 KB, image/jpeg) and `meta/*.json` (`flagged: false`, labels from Rekognition) appeared in about 5 s; queue and DLQ empty afterwards.
+  - Via CloudFront: thumbnail returns 200 `image/jpeg`; the original and the meta file return 403.
+  - Lambda role inspected: no wildcard actions; only the Rekognition statement uses `Resource "*"`. Lambda has no VpcConfig. Redrive policy: DLQ with `maxReceiveCount` 3. `/health` through CloudFront reports 1.2.0.
+  - Test objects deleted afterwards (versioning leaves delete markers that expire after 30 days).
+- **Not yet verified:** DLQ path with a real poison message (takes about 3 visibility timeouts); claim email end to end (needs a confirmed email subscription and a claim from a second account); the moderation branch with a real flagged image (only tested with stubs).
+- **Screenshots to take** (blur account ID): `phase-5-sqs-queues.png` (image-jobs with DLQ redrive), `phase-5-s3-event-notification.png` (uploads bucket → Properties → Event notifications), `phase-5-lambda-config.png`, `phase-5-lambda-trigger-sqs.png`, `phase-5-s3-thumbnails-meta.png` (bucket prefixes after a real upload), `phase-5-item-with-labels.png` (item page with Rekognition tags), `phase-6-sns-topics.png`, `phase-6-claim-email.png` (the owner's email), `phase-6-ops-alerts-subscription.png`.
