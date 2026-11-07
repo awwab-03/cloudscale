@@ -36,3 +36,16 @@ Give the app a way for students to sign up and sign in (Cognito), and give the a
 
 ### Open questions
 - None.
+
+## Construction — approved plan
+`infra/identity.tf`: Cognito user pool + secretless app client, SSM SecureString `/cloudscale/app-secret-key` (random, state only), log group `/cloudscale/app`, role/instance profile `cloudscale-ec2-app` with a scoped inline policy and `AmazonSSMManagedInstanceCore`. Plan: 9 to add, 0 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-08.
+
+## Operations
+- **Built:** pool `cloudscale-users`, client `cloudscale-app`, SSM param, log group, `cloudscale-ec2-app` role + profile.
+- **Decisions:** ARNs for the SNS topic (`claim-notifications`) and SageMaker endpoint (`cloudscale-category`) are fixed by name before those resources exist; `kms:Decrypt` is the only `*` resource and is limited by `kms:ViaService`; `AdminGetUser` not granted.
+- **Verification (CLI):**
+  - Cognito: `sign-up` accepted (email code delivery); a throwaway test user was confirmed with `admin-confirm-sign-up`, `initiate-auth` (USER_PASSWORD_AUTH) returned access, ID and refresh tokens, then the user was deleted. The real email-code flow is exercised in the app.
+  - IAM: all 10 statements inspected: no wildcard actions; the only bare `*` resource is the KMS statement, which has its ViaService condition; only managed policy attached is `AmazonSSMManagedInstanceCore`.
+  - SSM: `/cloudscale/app-secret-key` exists as SecureString.
+- **Screenshots to take** (blur account ID): `phase-7-cognito-pool.png` (user pool overview), `phase-7-cognito-client.png` (app client: no secret, auth flows), `phase-7-iam-role.png` (role permissions tab), `phase-7-iam-policy-json.png` (inline policy JSON, scrolled to show scoped ARNs), `phase-7-ssm-param.png` (parameter type SecureString; do not reveal the value).

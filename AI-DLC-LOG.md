@@ -25,3 +25,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed db.t4g.micro, gp3 20 GB, managed master password, 1-day backups; human review: Awwab approved the plan (2 resources) unchanged
 - Operations: applied; verified available, private, single-AZ, encrypted, correct security group via AWS CLI
 - Evidence screenshots: phase-4-rds-config.png, phase-4-rds-connectivity.png, phase-4-secret.png
+
+## Bolt 7 — Cognito + EC2 IAM role — 2026-11-08 PKT
+- Inception: Cognito pool/client, SSM secret, least-privilege app role → docs/aidlc/phase-7-identity.md
+- Construction: AI proposed a scoped inline policy with one documented `*` (KMS via SSM); human review: Awwab approved the plan (9 resources) unchanged
+- Operations: applied; test user signed up, confirmed, authenticated and was deleted via CLI; policy inspected for wildcards
+- Evidence screenshots: phase-7-cognito-pool.png, phase-7-cognito-client.png, phase-7-iam-role.png, phase-7-iam-policy-json.png, phase-7-ssm-param.png
