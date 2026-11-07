@@ -59,3 +59,9 @@ Incidents and fixes (human-approved):
   - ALB DNS called directly from the internet gets no response (security group allows only the CloudFront prefix list), so the ALB cannot be reached except through CloudFront.
 - **Not yet verified:** browser flow (sign up with a real email code, sign in, post an item with photo, photo loads via `/media/...`, claim); to be done by Awwab and recorded.
 - **Screenshots to take** (blur account ID): `phase-2-site-home.png`, `phase-2-signup-confirm.png`, `phase-2-post-item.png`, `phase-2-item-with-photo.png`, `phase-2-alb-target-group-healthy.png`, `phase-2-asg-instances.png`, `phase-2-cloudfront-distribution.png`, `phase-2-ec2-instances-private.png` (no public IPs).
+
+## Release 1.3.0 (handover flow), 2026-11-07
+- **Why:** during Awwab's browser test the question "how do the two users arrange the handover after a claim?" exposed a gap: the owner's claim email had no contact details, nobody could set `returned`, and claim messages were publicly visible.
+- **Change:** the claim email now includes the claimant's email address (private email only); the owner gets a "Mark as returned" action (`POST /items/<id>/return`, owner only, only for `claimed` items); claim messages are visible only to the owner and the claimant (others see a count); the claim form tells the claimant to leave a way to be reached.
+- **Plan:** 0 to add, 2 to change, 0 to destroy (launch template and ASG, rolling instance refresh). Approved by Awwab Aamir, 2026-11-07 (upload app 1.3.0 and apply).
+- **Verification:** refresh Successful (100%), 2 healthy targets, `/health` reports 1.3.0, item page returns 200. Route behaviour tested locally with a mocked database: a stranger cannot read claim messages and gets 403 on return; the owner can return a claimed item once; the button disappears afterwards; the notification text includes the reply address.

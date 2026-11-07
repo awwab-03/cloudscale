@@ -73,3 +73,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI researched providers and wrote Plan B after DigitalPlat refused every name; human review: Awwab tried the signup, chose to fall back, approved the plan (3 resources)
 - Operations: zone and A/AAAA alias records applied; nslookup against the zone's own name server returns CloudFront IPv4 and IPv6 addresses
 - Evidence screenshots: phase-8-route53-zone.png, phase-8-route53-records.png, phase-8-nslookup.png
+
+## Release 1.3.0 — handover flow — 2026-11-07 PKT
+- Inception: gap found by the human during the browser test (no way to arrange the item handover; claim messages public)
+- Construction: AI proposed contact email in the owner notification, an owner-only Mark as returned action and private claim messages; human review: Awwab asked for it to be built and approved the release plan (2 changes)
+- Operations: rolling refresh to 1.3.0 finished with healthy targets and /health reporting 1.3.0
+- Evidence screenshots: phase-2-item-handover.png (owner's item page with the Handover box), phase-6-claim-email.png (email with the reply address)
