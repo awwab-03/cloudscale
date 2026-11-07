@@ -49,3 +49,15 @@ output "db_endpoint" {
 output "db_secret_arn" {
   value = aws_db_instance.main.master_user_secret[0].secret_arn
 }
+
+output "cognito_user_pool_id" {
+  value = aws_cognito_user_pool.main.id
+}
+
+output "cognito_app_client_id" {
+  value = aws_cognito_user_pool_client.app.id
+}
+
+output "ec2_app_instance_profile" {
+  value = aws_iam_instance_profile.ec2_app.name
+}
