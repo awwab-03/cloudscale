@@ -33,6 +33,17 @@ variable "private_db_subnet_cidrs" {
   default = ["10.20.21.0/24", "10.20.22.0/24"]
 }
 
+variable "app_version" {
+  description = "Version of s3://<artifacts>/app/app-<version>.zip. Changing it triggers a rolling instance refresh."
+  type        = string
+  default     = "1.0.0"
+}
+
+variable "app_instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
 variable "nat_instance_type" {
   type    = string
   default = "t4g.micro"

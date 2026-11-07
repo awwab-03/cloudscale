@@ -61,3 +61,15 @@ output "cognito_app_client_id" {
 output "ec2_app_instance_profile" {
   value = aws_iam_instance_profile.ec2_app.name
 }
+
+output "cloudfront_domain" {
+  value = aws_cloudfront_distribution.main.domain_name
+}
+
+output "alb_dns_name" {
+  value = aws_lb.app.dns_name
+}
+
+output "asg_name" {
+  value = aws_autoscaling_group.app.name
+}

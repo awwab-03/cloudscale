@@ -15,3 +15,4 @@ Every role is least-privilege and named `cloudscale-*`. No `AdministratorAccess`
 | `cloudscale-ec2-app`: SageMaker | `InvokeEndpoint` on endpoint `cloudscale-category` | Category prediction | No, one ARN |
 | `cloudscale-ec2-app`: Logs | `CreateLogStream`, `PutLogEvents` on `/cloudscale/app:*` | Application logs | No, one log group |
 | `cloudscale-ec2-app`: managed policy | `AmazonSSMManagedInstanceCore` | Session Manager (no SSH) | No (managed policy) |
+| Uploads bucket policy (Bolt 2/3b) | `s3:GetObject` on `originals/*` and `thumbnails/*` for principal `cloudfront.amazonaws.com`, condition `AWS:SourceArn` = the CloudScale distribution | CloudFront serves photos via OAC; the bucket stays private and `meta/` is never exposed | No, specific prefixes and one distribution |

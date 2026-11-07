@@ -99,6 +99,26 @@ data "aws_iam_policy_document" "uploads_tls_only" {
       values   = ["false"]
     }
   }
+
+  # Only the CloudFront distribution (via OAC) may read photos; /meta is never public.
+  statement {
+    sid     = "AllowCloudFrontReadPhotos"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+    resources = [
+      "${aws_s3_bucket.uploads.arn}/originals/*",
+      "${aws_s3_bucket.uploads.arn}/thumbnails/*",
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.main.arn]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "uploads" {
