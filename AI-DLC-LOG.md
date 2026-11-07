@@ -67,3 +67,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed terminating the us-east-1a instance while probing the site every second; human review: Awwab approved
 - Operations: about 25 s blip (2 x 502, 2 timeouts out of 258 probes), then all 200 on one instance; ASG launched a replacement and the target group was back to 2 healthy in about 4 minutes
 - Evidence screenshots: phase-8-failure-asg-activity.png, phase-8-failure-instances.png, phase-8-failure-target-group.png
+
+## Bolt 8 (part 2) — Route 53 Plan B — 2026-11-07 PKT
+- Inception: Plan A (free delegated subdomain) or Plan B (zone queried via its own name servers) → docs/aidlc/phase-8-monitoring-dns.md
+- Construction: AI researched providers and wrote Plan B after DigitalPlat refused every name; human review: Awwab tried the signup, chose to fall back, approved the plan (3 resources)
+- Operations: zone and A/AAAA alias records applied; nslookup against the zone's own name server returns CloudFront IPv4 and IPv6 addresses
+- Evidence screenshots: phase-8-route53-zone.png, phase-8-route53-records.png, phase-8-nslookup.png

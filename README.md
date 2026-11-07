@@ -20,6 +20,7 @@ See `CLAUDE.md` for the full brief and `AI-DLC-LOG.md` for the build log.
 | 2 | App, ASG, ALB, CloudFront | deployed (browser test pending) |
 | 10 | SageMaker + Bedrock | deployed |
 | 5+6 | SQS, Lambda thumbnailer, SNS | deployed (app 1.2.0) |
+| 8 | CloudWatch dashboard, alarms, Route 53 (Plan B) | deployed; load and failure tests done |
 
 ## Setup / Deploy / Teardown
 _To be filled in as phases complete._
