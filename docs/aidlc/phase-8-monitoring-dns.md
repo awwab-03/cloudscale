@@ -39,3 +39,15 @@ Missing data is treated as "not breaching" so idle periods don't alarm.
 
 ### Open questions
 - Plan A vs Plan B for DNS (provider research in progress).
+
+## Construction — approved plan (dashboard and alarms)
+`infra/monitoring.tf`: dashboard `CloudScale` (8 widgets), alarms `cloudscale-asg-cpu-high`, `cloudscale-alb-target-5xx`, `cloudscale-lambda-errors`, `cloudscale-dlq-not-empty` (all alarm and OK actions to `ops-alerts`), plus ASG group metrics (`GroupInServiceInstances`, `GroupDesiredCapacity`, `GroupTotalInstances`, 1-minute) in `infra/compute.tf`. Plan: 5 to add, 1 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-07.
+
+## Operations (dashboard and alarms)
+- **Built:** the dashboard and four alarms; ASG metrics enabled in place (no instance refresh).
+- **Decisions:** `treat_missing_data = notBreaching` so idle periods stay in OK; alarms notify both on ALARM and on OK; alarm thresholds exactly as in the brief.
+- **Verification (CLI):** `apply` created 5 and changed 1; `describe-alarms` lists the four alarms, each with the `ops-alerts` topic as its action (state `INSUFFICIENT_DATA` right after creation, which is normal until the first datapoints); `get-dashboard` returns 8 widgets; ASG reports the three enabled metrics.
+- **To prove during the load test:** CPU alarm reaches `ALARM` and the email arrives at `i220971@nu.edu.pk`; dashboard shows InService instances rising to 3-4.
+- **DNS (Route 53):** pending provider decision. Provider research: DigitalPlat FreeDomain documents delegating a registered domain to external nameservers, but which extensions are free and how fast approval is could not be verified from the public docs; fallback is Plan B (hosted zone queried through its own name servers).
+- **Screenshots to take** (blur account ID): `phase-8-dashboard.png` (CloudWatch → Dashboards → CloudScale, populated after some traffic), `phase-8-alarms-list.png`, `phase-8-alarm-asg-cpu-config.png` (threshold 70, 2 x 5 min, action ops-alerts), later `phase-8-alarm-fired.png` and `phase-8-alarm-email.png` from the load test.

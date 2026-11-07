@@ -49,3 +49,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed meta/*.json handoff (Lambda cannot reach RDS) and serving thumbnails only; human review: Awwab approved the plan (12 add, 3 change) unchanged
 - Operations: applied; generated image became a thumbnail + labels in about 5 s; CloudFront serves the thumbnail (200) and refuses originals and meta (403); app 1.2.0 rolled out
 - Evidence screenshots: phase-5-sqs-queues.png, phase-5-s3-event-notification.png, phase-5-lambda-config.png, phase-5-s3-thumbnails-meta.png, phase-5-item-with-labels.png, phase-6-sns-topics.png, phase-6-claim-email.png
+
+## Bolt 8 (part 1) — CloudWatch dashboard and alarms — 2026-11-07 PKT
+- Inception: dashboard, four alarms to ops-alerts, Route 53 plan A/B → docs/aidlc/phase-8-monitoring-dns.md
+- Construction: AI proposed dashboard widgets and alarms exactly per the brief plus ASG group metrics; human review: Awwab approved the plan (5 add, 1 change) unchanged
+- Operations: applied; four alarms with ops-alerts action and an 8-widget dashboard verified via CLI; alarm firing to be shown during the load test
+- Evidence screenshots: phase-8-dashboard.png, phase-8-alarms-list.png, phase-8-alarm-asg-cpu-config.png
