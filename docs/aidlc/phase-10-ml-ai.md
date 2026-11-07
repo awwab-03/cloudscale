@@ -45,3 +45,21 @@ Two smart helpers in the "Post an item" form:
 ## Construction — approved plan (stage 1)
 `ml/make_seed.py` + `ml/data/seed_listings.csv` (400 rows), `ml/train.py`, `ml/launch_training.py`, `ml/deploy_endpoint.py`, `ml/delete_endpoint.py`, and Terraform role `cloudscale-sagemaker-exec` (`infra/ml.tf`). Plan: 2 to add, 0 to change, 0 to destroy. Local training check: holdout_accuracy 0.9875 on synthetic data.
 Approved by Awwab Aamir, 2026-11-07.
+
+## Construction — approved plan (stage 2: training, endpoint, app release)
+- Training job on SageMaker, then serverless endpoint `cloudscale-category`, then app 1.1.0 with `/api/suggest-category` (SageMaker `InvokeEndpoint`) and `/api/write-description` (Bedrock Converse, `us.amazon.nova-micro-v1:0`), form buttons, and `app/seed_db.py`. App release plan: 0 to add, 2 to change, 0 to destroy (launch template + ASG, rolling refresh).
+- Approved by Awwab Aamir, 2026-11-07 at each step: role apply; run training; train on `ml.g5.xlarge`; deploy endpoint; upload 1.1.0, apply and seed demo data.
+
+Incident: the first `CreateTrainingJob` on `ml.m5.large` failed with `ResourceLimitExceeded` (new-account quota 0 for that type). This is an account quota, not a Free-plan block. I listed the quotas (read-only): only GPU types (g5/g6/g6e/g7/g7e) had quota. Awwab approved `ml.g5.xlarge` (CPU scikit-learn container runs on it unchanged). `launch_training.py` now takes the instance type as an argument.
+
+## Operations
+- **Built:** training job `cloudscale-category-20261107-175352` (74 billable seconds on `ml.g5.xlarge`, about $0.02), model artifact at `s3://cloudscale-artifacts-<acct>/ml/output/.../model.tar.gz`, serverless endpoint `cloudscale-category` (1024 MB, max concurrency 2, no provisioned instances), app 1.1.0 live, 36 demo listings from 3 demo users.
+- **Decisions:** boto3 scripts instead of the SageMaker Python SDK (avoids SDK v2/v3 differences); Terraform owns only the IAM role so scripts can create/delete the training/endpoint resources; JSON-only, login-required API endpoints (also blocks cross-site form posts); Bedrock prompt tells the model not to invent details or contact info.
+- **Verification:**
+  - Training log: `loaded 400 listings, 8 categories`, `holdout_accuracy=0.9875`, `model saved`.
+  - Endpoint `InService`; `invoke-endpoint` results: "black Samsung phone near library" → Electronics (0.67), "student ID card found in cafeteria" → ID/Cards (0.89), "hostel room key with football keychain" → Keys (0.97), "blue hoodie left on chair" → Clothing (0.89).
+  - Bedrock Converse called from the app code: returned a 3-sentence description without invented details.
+  - Rolling refresh to 1.1.0 finished (Successful, 100%) with the targets healthy throughout; `/health` returns version 1.1.0 through CloudFront; anonymous call to `/api/suggest-category` returns 401; home page shows 36 seeded cards; search `q=phone` returns 2, `category=Keys` returns 4.
+- **Honest limitations for the report:** training data is synthetic (template-generated), so the 98.75% hold-out accuracy is optimistic and not a real-world figure; the first serverless call can be slow (cold start).
+- **Not yet verified:** the two buttons in a real browser session (needs sign-in with a real email).
+- **Screenshots to take** (blur account ID): `phase-10-training-job.png` (SageMaker → Training jobs, Completed), `phase-10-training-logs.png` (CloudWatch log showing holdout_accuracy), `phase-10-endpoint-serverless.png` (Endpoint settings showing Serverless, memory 1024), `phase-10-form-category-suggestion.png` (post form after clicking Suggest category), `phase-10-form-ai-description.png` (after Write description with AI), `phase-10-bedrock-model-access.png` (optional: Bedrock model catalog showing Nova Micro).

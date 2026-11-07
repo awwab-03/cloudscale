@@ -18,6 +18,7 @@ See `CLAUDE.md` for the full brief and `AI-DLC-LOG.md` for the build log.
 | 4 | RDS PostgreSQL | done |
 | 7 | Cognito + IAM | done |
 | 2 | App, ASG, ALB, CloudFront | deployed (browser test pending) |
+| 10 | SageMaker + Bedrock | deployed (app 1.1.0) |
 
 ## Setup / Deploy / Teardown
 _To be filled in as phases complete._

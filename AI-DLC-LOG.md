@@ -37,3 +37,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed the app and stack (12 to add, 1 to change); human review: Awwab approved; two issues found during apply (ASG service-linked role delay, Windows zip backslashes) were diagnosed from instance logs and fixed with Awwab's approval of a second plan
 - Operations: 2 healthy instances behind ALB behind CloudFront; /health 200 through CloudFront, ALB unreachable directly, DB connection and migration proven; browser flow pending
 - Evidence screenshots: phase-2-site-home.png, phase-2-signup-confirm.png, phase-2-post-item.png, phase-2-item-with-photo.png, phase-2-alb-target-group-healthy.png, phase-2-asg-instances.png, phase-2-cloudfront-distribution.png, phase-2-ec2-instances-private.png
+
+## Bolt 10 — SageMaker category model + Bedrock description writer — 2026-11-07 PKT
+- Inception: custom text classifier trained in SageMaker, serverless endpoint, Bedrock Converse writer → docs/aidlc/phase-10-ml-ai.md
+- Construction: AI proposed boto3 training/deploy scripts and a least-privilege SageMaker role; human review: Awwab approved each step; training hit a 0 quota for ml.m5.large, Awwab approved ml.g5.xlarge (about $0.02) instead
+- Operations: trained (hold-out 0.9875 on synthetic data), endpoint InService (serverless), app 1.1.0 released by rolling refresh, 36 demo listings seeded; verified with endpoint invocations, Bedrock call and HTTP checks
+- Evidence screenshots: phase-10-training-job.png, phase-10-training-logs.png, phase-10-endpoint-serverless.png, phase-10-form-category-suggestion.png, phase-10-form-ai-description.png
