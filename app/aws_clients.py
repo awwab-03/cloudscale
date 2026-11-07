@@ -5,6 +5,7 @@ import uuid
 
 import boto3
 from botocore import UNSIGNED
+from botocore.exceptions import ClientError
 from botocore.config import Config
 
 import config
@@ -140,3 +141,19 @@ def write_description(kind, title, notes, category, location):
         inferenceConfig={"maxTokens": 200, "temperature": 0.3},
     )
     return resp["output"]["message"]["content"][0]["text"].strip()
+
+
+def image_name(image_key):
+    """originals/<name>.<ext> -> <name>"""
+    return os.path.splitext(image_key.split("/", 1)[-1])[0]
+
+
+def get_meta(image_key):
+    """Labels/moderation result written by the thumbnailer Lambda, or None while still processing."""
+    if not image_key:
+        return None
+    try:
+        obj = s3().get_object(Bucket=config.UPLOADS_BUCKET, Key=f"meta/{image_name(image_key)}.json")
+        return json.loads(obj["Body"].read())
+    except ClientError:  # missing key (403/404 without ListBucket) = not processed yet
+        return None

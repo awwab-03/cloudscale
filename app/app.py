@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 
@@ -32,9 +33,10 @@ def _inject():
             "version": config.APP_VERSION}
 
 
-@app.template_filter("media")
-def media_url(key):
-    return f"/media/{key}" if key else ""
+@app.template_filter("thumb")
+def thumb_url(key):
+    """Photos are served from CloudFront as thumbnails only (originals are never public)."""
+    return f"/media/thumbnails/{aws_clients.image_name(key)}.jpg" if key else ""
 
 
 # ---------------------------------------------------------------- health / ops
@@ -230,7 +232,19 @@ def item_detail(item_id):
             "SELECT c.*, u.display_name AS claimant_name FROM claims c "
             "JOIN users u ON u.sub = c.claimant_sub WHERE c.item_id = %s ORDER BY c.created_at",
             (item_id,)).fetchall()
-    return render_template("item.html", item=item, claims=claims)
+    photo_state, meta = "none", None
+    if item["image_key"]:
+        meta = aws_clients.get_meta(item["image_key"])
+        photo_state = "pending" if meta is None else ("flagged" if meta.get("flagged") else "ok")
+    if meta and not meta.get("flagged") and meta.get("labels") and not item["labels"]:
+        item["labels"] = meta["labels"]  # persist the Rekognition labels the Lambda cannot write to RDS
+        try:
+            with db.get_conn() as conn:
+                conn.execute("UPDATE items SET labels = %s::jsonb WHERE id = %s",
+                             (json.dumps(meta["labels"]), item_id))
+        except Exception as exc:
+            log.warning("could not store labels: %s", exc)
+    return render_template("item.html", item=item, claims=claims, photo_state=photo_state)
 
 
 @app.post("/items/<int:item_id>/claim")

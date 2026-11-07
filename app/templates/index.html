@@ -19,7 +19,7 @@
 <div class="grid">
 {% for i in items %}
   <a class="card" href="{{ url_for('item_detail', item_id=i.id) }}" style="text-decoration:none;color:inherit">
-    {% if i.image_key %}<img src="{{ i.image_key | media }}" alt="{{ i.title }}" loading="lazy">{% endif %}
+    {% if i.image_key %}<img src="{{ i.image_key | thumb }}" alt="{{ i.title }}" loading="lazy" onerror="this.style.display='none'">{% endif %}
     <p><span class="tag {{ i.kind }}">{{ i.kind }}</span> <span class="tag">{{ i.category }}</span>
        {% if i.status != 'open' %}<span class="tag">{{ i.status }}</span>{% endif %}</p>
     <strong>{{ i.title }}</strong>

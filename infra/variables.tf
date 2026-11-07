@@ -33,10 +33,16 @@ variable "private_db_subnet_cidrs" {
   default = ["10.20.21.0/24", "10.20.22.0/24"]
 }
 
+variable "alert_email" {
+  description = "Recipient of ops-alerts (CloudWatch alarms)."
+  type        = string
+  default     = "i220971@nu.edu.pk"
+}
+
 variable "app_version" {
   description = "Version of s3://<artifacts>/app/app-<version>.zip. Changing it triggers a rolling instance refresh."
   type        = string
-  default     = "1.1.0"
+  default     = "1.2.0"
 }
 
 variable "app_instance_type" {

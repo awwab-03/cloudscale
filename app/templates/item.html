@@ -5,7 +5,9 @@
   <p><span class="tag {{ item.kind }}">{{ item.kind }}</span> <span class="tag">{{ item.category }}</span>
      <span class="tag">{{ item.status }}</span></p>
   <h2>{{ item.title }}</h2>
-  {% if item.image_key %}<img src="{{ item.image_key | media }}" alt="{{ item.title }}">{% endif %}
+  {% if photo_state == 'ok' %}<img src="{{ item.image_key | thumb }}" alt="{{ item.title }}">
+  {% elif photo_state == 'pending' %}<p class="muted">Photo is being processed. Refresh in a few seconds.</p>
+  {% elif photo_state == 'flagged' %}<p class="muted">This photo was hidden by automatic content moderation.</p>{% endif %}
   {% if item.description %}<p>{{ item.description }}</p>{% endif %}
   {% if item.notes %}<p class="muted">Notes: {{ item.notes }}</p>{% endif %}
   <p class="muted">Location: {{ item.location or '—' }} &middot; Date: {{ item.item_date or '—' }}

@@ -77,3 +77,19 @@ output "asg_name" {
 output "sagemaker_exec_role_arn" {
   value = aws_iam_role.sagemaker_exec.arn
 }
+
+output "image_jobs_queue_url" {
+  value = aws_sqs_queue.image_jobs.id
+}
+
+output "image_jobs_dlq_url" {
+  value = aws_sqs_queue.image_jobs_dlq.id
+}
+
+output "claim_topic_arn" {
+  value = aws_sns_topic.claim_notifications.arn
+}
+
+output "ops_alerts_topic_arn" {
+  value = aws_sns_topic.ops_alerts.arn
+}
