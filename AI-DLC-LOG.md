@@ -55,3 +55,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed dashboard widgets and alarms exactly per the brief plus ASG group metrics; human review: Awwab approved the plan (5 add, 1 change) unchanged
 - Operations: applied; four alarms with ops-alerts action and an 8-widget dashboard verified via CLI; alarm firing to be shown during the load test
 - Evidence screenshots: phase-8-dashboard.png, phase-8-alarms-list.png, phase-8-alarm-asg-cpu-config.png
+
+## Load test — scale-out demo — 2026-11-07 PKT
+- Inception: scaling demo specified in CLAUDE.md §9/§12 (target tracking at 50% CPU, load generator via CloudFront)
+- Construction: AI wrote scripts/load_test.py and a plan to toggle the stress flag; human review: Awwab approved running it
+- Operations: 14,819 requests, 0 errors; ASG scaled 2 → 4; throughput about 13 → 26 req/s; CPU alarm fired; flag restored to false
+- Evidence screenshots: phase-8-dashboard-load.png, phase-8-alarm-fired.png, phase-8-alarm-email.png, phase-8-asg-activity.png
