@@ -61,3 +61,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI wrote scripts/load_test.py and a plan to toggle the stress flag; human review: Awwab approved running it
 - Operations: 14,819 requests, 0 errors; ASG scaled 2 → 4; throughput about 13 → 26 req/s; CPU alarm fired; flag restored to false
 - Evidence screenshots: phase-8-dashboard-load.png, phase-8-alarm-fired.png, phase-8-alarm-email.png, phase-8-asg-activity.png
+
+## Failure test — instance loss and self-healing — 2026-11-07 PKT
+- Inception: failure scenario specified in CLAUDE.md §12 (terminate an instance; ASG replaces it; ALB routes around it)
+- Construction: AI proposed terminating the us-east-1a instance while probing the site every second; human review: Awwab approved
+- Operations: about 25 s blip (2 x 502, 2 timeouts out of 119 probes), then all 200 on one instance; ASG launched a replacement and the target group was back to 2 healthy in about 4 minutes
+- Evidence screenshots: phase-8-failure-asg-activity.png, phase-8-failure-instances.png, phase-8-failure-target-group.png
