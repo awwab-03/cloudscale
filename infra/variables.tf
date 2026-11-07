@@ -42,7 +42,7 @@ variable "alert_email" {
 variable "app_version" {
   description = "Version of s3://<artifacts>/app/app-<version>.zip. Changing it triggers a rolling instance refresh."
   type        = string
-  default     = "1.2.0"
+  default     = "1.3.0"
 }
 
 variable "app_instance_type" {

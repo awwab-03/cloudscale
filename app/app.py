@@ -244,7 +244,13 @@ def item_detail(item_id):
                              (json.dumps(meta["labels"]), item_id))
         except Exception as exc:
             log.warning("could not store labels: %s", exc)
-    return render_template("item.html", item=item, claims=claims, photo_state=photo_state)
+    me = auth.current_user()
+    # Claim messages may contain contact details: only the owner and the claimants may read them.
+    claims_visible = bool(me) and (me["sub"] == item["owner_sub"]
+                                   or any(c["claimant_sub"] == me["sub"] for c in claims))
+    return render_template("item.html", item=item, claims=claims, photo_state=photo_state,
+                           claims_visible=claims_visible,
+                           is_owner=bool(me) and me["sub"] == item["owner_sub"])
 
 
 @app.post("/items/<int:item_id>/claim")
@@ -267,8 +273,26 @@ def claim_item(item_id):
         conn.execute("INSERT INTO claims (item_id, claimant_sub, message) VALUES (%s, %s, %s)",
                      (item_id, me["sub"], message))
         conn.execute("UPDATE items SET status = 'claimed' WHERE id = %s", (item_id,))
-    aws_clients.publish_claim(item["owner_email"], item["title"], me["name"], message)
+    aws_clients.publish_claim(item["owner_email"], item["title"], me["name"], me["email"], message)
     flash("Claim sent. The owner will be notified.", "ok")
+    return redirect(url_for("item_detail", item_id=item_id))
+
+
+@app.post("/items/<int:item_id>/return")
+@auth.login_required
+def mark_returned(item_id):
+    me = auth.current_user()
+    with db.get_conn() as conn:
+        item = conn.execute("SELECT owner_sub, status FROM items WHERE id = %s", (item_id,)).fetchone()
+        if not item:
+            abort(404)
+        if item["owner_sub"] != me["sub"]:
+            abort(403)
+        if item["status"] != "claimed":
+            flash("Only a claimed item can be marked as returned.", "error")
+            return redirect(url_for("item_detail", item_id=item_id))
+        conn.execute("UPDATE items SET status = 'returned' WHERE id = %s", (item_id,))
+    flash("Marked as returned. Thank you!", "ok")
     return redirect(url_for("item_detail", item_id=item_id))
 
 

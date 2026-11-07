@@ -79,7 +79,7 @@ def subscribe_owner(email):
         log.warning("SNS subscribe skipped: %s", exc)
 
 
-def publish_claim(owner_email, item_title, claimant_name, message):
+def publish_claim(owner_email, item_title, claimant_name, claimant_email, message):
     if not config.CLAIM_TOPIC_ARN:
         return
     try:
@@ -88,7 +88,9 @@ def publish_claim(owner_email, item_title, claimant_name, message):
             Subject="Someone claimed your item on CloudScale",
             Message=(
                 f"{claimant_name} claimed your item: {item_title}\n\n"
-                f"Message: {message or '(none)'}"
+                f"Message: {message or '(none)'}\n\n"
+                f"Reply to {claimant_email} to arrange the handover. "
+                "When the item is back with you, open it on the site and press 'Mark as returned'."
             ),
             MessageAttributes={"owner_email": {"DataType": "String", "StringValue": owner_email}},
         )

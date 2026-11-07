@@ -21,7 +21,8 @@
   {% if user %}
     <form method="post" action="{{ url_for('claim_item', item_id=item.id) }}">
       <label for="message">Message to the finder</label>
-      <textarea id="message" name="message" rows="3" placeholder="Describe something only the owner would know"></textarea>
+      <textarea id="message" name="message" rows="3" placeholder="Describe something only the owner would know, and say how to reach you (phone number or where to meet)."></textarea>
+      <p class="muted">Only the finder can read this message. Your email address is also sent to the finder so they can reply.</p>
       <p><button>Claim this item</button></p>
     </form>
   {% else %}
@@ -30,10 +31,22 @@
 </div>
 {% endif %}
 
+{% if is_owner and item.status == 'claimed' %}
+<div class="card" style="margin-top:1rem">
+  <h3>Handover</h3>
+  <p class="muted">Check your email for the claimant's contact details. Once the item is back with its owner:</p>
+  <form method="post" action="{{ url_for('mark_returned', item_id=item.id) }}"><button>Mark as returned</button></form>
+</div>
+{% endif %}
+
 {% if claims %}
 <div class="card" style="margin-top:1rem">
   <h3>Claims</h3>
-  {% for c in claims %}<p><strong>{{ c.claimant_name }}</strong>: {{ c.message or '(no message)' }}</p>{% endfor %}
+  {% if claims_visible %}
+    {% for c in claims %}<p><strong>{{ c.claimant_name }}</strong>: {{ c.message or '(no message)' }}</p>{% endfor %}
+  {% else %}
+    <p class="muted">{{ claims | length }} claim(s) made. Only the owner and the claimant can read them.</p>
+  {% endif %}
 </div>
 {% endif %}
 {% endblock %}
