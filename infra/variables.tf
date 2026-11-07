@@ -36,7 +36,7 @@ variable "private_db_subnet_cidrs" {
 variable "app_version" {
   description = "Version of s3://<artifacts>/app/app-<version>.zip. Changing it triggers a rolling instance refresh."
   type        = string
-  default     = "1.0.0"
+  default     = "1.0.1"
 }
 
 variable "app_instance_type" {

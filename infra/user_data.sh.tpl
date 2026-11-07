@@ -10,7 +10,8 @@ cd /opt/cloudscale
 aws s3 cp "s3://${artifacts_bucket}/app/app-${app_version}.zip" app.zip --region ${region}
 rm -rf app
 mkdir app
-unzip -q app.zip -d app
+# unzip exits 1 on warnings (e.g. path-separator notices); only fail on real errors (>1)
+unzip -q app.zip -d app || [ $? -eq 1 ]
 
 python3.12 -m venv venv
 ./venv/bin/pip install --no-cache-dir -r app/requirements.txt
