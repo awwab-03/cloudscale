@@ -16,3 +16,7 @@ Every role is least-privilege and named `cloudscale-*`. No `AdministratorAccess`
 | `cloudscale-ec2-app`: Logs | `CreateLogStream`, `PutLogEvents` on `/cloudscale/app:*` | Application logs | No, one log group |
 | `cloudscale-ec2-app`: managed policy | `AmazonSSMManagedInstanceCore` | Session Manager (no SSH) | No (managed policy) |
 | Uploads bucket policy (Bolt 2/3b) | `s3:GetObject` on `originals/*` and `thumbnails/*` for principal `cloudfront.amazonaws.com`, condition `AWS:SourceArn` = the CloudScale distribution | CloudFront serves photos via OAC; the bucket stays private and `meta/` is never exposed | No, specific prefixes and one distribution |
+| `cloudscale-sagemaker-exec` (Phase 10): S3 | `GetObject`, `PutObject` on `artifacts/ml/*`; `ListBucket` on the artifacts bucket only for prefix `ml/*` | Read training code and data, write the model artifact | No |
+| `cloudscale-sagemaker-exec`: ECR | `BatchCheckLayerAvailability`, `GetDownloadUrlForLayer`, `BatchGetImage` on `sagemaker-scikit-learn` repository | Pull the AWS scikit-learn container | No, one repository |
+| `cloudscale-sagemaker-exec`: ECR token | `ecr:GetAuthorizationToken` | Required to authenticate the image pull; the API has no resource-level permissions | **Yes, `Resource: "*"`** |
+| `cloudscale-sagemaker-exec`: Logs | `CreateLogGroup`, `CreateLogStream`, `PutLogEvents`, `DescribeLogStreams` on `/aws/sagemaker/*` | Training and endpoint logs | No, SageMaker log groups only |

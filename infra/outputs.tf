@@ -73,3 +73,7 @@ output "alb_dns_name" {
 output "asg_name" {
   value = aws_autoscaling_group.app.name
 }
+
+output "sagemaker_exec_role_arn" {
+  value = aws_iam_role.sagemaker_exec.arn
+}
