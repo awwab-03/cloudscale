@@ -1,9 +1,10 @@
 """Uploads code + data to s3://<artifacts>/ml/ and runs a SageMaker training job (boto3, no SDK).
 
-Usage: python ml/launch_training.py
+Usage: python ml/launch_training.py [instance-type]   (default ml.m5.large)
 """
 import io
 import os
+import sys
 import tarfile
 import time
 
@@ -12,6 +13,7 @@ import boto3
 REGION = "us-east-1"
 IMAGE = "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:1.2-1-cpu-py3"
 ROLE_NAME = "cloudscale-sagemaker-exec"
+INSTANCE_TYPE = sys.argv[1] if len(sys.argv) > 1 else "ml.m5.large"
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 sts = boto3.client("sts", region_name=REGION)
@@ -50,7 +52,7 @@ sm.create_training_job(
         "ContentType": "text/csv",
     }],
     OutputDataConfig={"S3OutputPath": f"s3://{bucket}/ml/output/"},
-    ResourceConfig={"InstanceType": "ml.m5.large", "InstanceCount": 1, "VolumeSizeInGB": 5},
+    ResourceConfig={"InstanceType": INSTANCE_TYPE, "InstanceCount": 1, "VolumeSizeInGB": 5},
     StoppingCondition={"MaxRuntimeInSeconds": 600},
     Tags=[{"Key": "Project", "Value": "CloudScale"}],
 )
