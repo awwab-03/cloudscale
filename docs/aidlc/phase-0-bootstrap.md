@@ -31,3 +31,6 @@ Approved by Awwab Aamir, 2026-11-07 (plan approved in session).
 - **Verification:** `gh repo view` reports PRIVATE; secret scan (`AKIA`, `aws_secret_access_key`, `password=`) clean on all non-brief files (the brief itself only quotes the rule text).
 - **Screenshots to take:** `docs/screenshots/phase-0-github-repo.png` (private repo page showing commits). No AWS account IDs or keys visible.
 - **Pending:** instructor GitHub username for collaborator invite.
+
+## Collaborator invite (2026-11-07)
+Instructor GitHub account verified read-only (`basharathussain`, "Dr. Basharat Hussain", Fast (NUCES) Islamabad, linked from basharathussain.github.io). A read-only invite was refused by GitHub (personal repositories only support write-level collaborators), so Awwab approved a normal collaborator invite. The invitation to `awwab-03/cloudscale` was sent at 18:21 UTC and is pending acceptance; acceptance must be confirmed before submission (repo Settings, Collaborators).
