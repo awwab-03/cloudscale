@@ -40,3 +40,22 @@ Get the Lost & Found website running on AWS, reachable over HTTPS: students sign
 
 ### Open questions
 - None.
+
+## Construction — approved plan
+App (`app/`), `scripts/package_app.ps1`, and Terraform: launch template, ASG (2/2/4, CPU target 50%), ALB with `X-Origin-Verify` rule, target group `/health`, CloudFront (ALB default, `/media/*` to S3 via OAC + strip-prefix function), SSM `/cloudscale/enable-stress`, uploads bucket policy statement for the distribution. Plan 1: 12 to add, 1 to change, 0 to destroy.
+Approved by Awwab Aamir, 2026-11-08 (upload app 1.0.0 and apply).
+
+Incidents and fixes (human-approved):
+1. **ASG creation error** "Access denied when attempting to assume role AWSServiceRoleForAutoScaling": AWS was still creating its service-linked role; the retry succeeded (ASG had 2 instances). Terraform tainted the ASG only because the apply errored; `terraform untaint` (state only), then applied the remaining scaling policy (1 to add).
+2. **Targets unhealthy**: `Compress-Archive` wrote backslash separators; Linux `unzip` exited 1 and `set -e` stopped the bootstrap. Fix: package with Python `zipfile`, tolerate unzip warning exit code 1 in `user_data`, bump `app_version` to 1.0.1. Plan 2: 0 to add, 2 to change, 0 to destroy (launch template + ASG → rolling instance refresh). Approved by Awwab Aamir, 2026-11-08 (upload app 1.0.1 and apply).
+
+## Operations
+- **Built:** ALB `cloudscale-alb`, target group, ASG `cloudscale-asg` (2 x t3.micro in 1a/1b private-app), CloudFront distribution, CloudFront function, OAC.
+- **Decisions:** ALB is HTTP-only behind CloudFront (no custom domain cert yet); secret header shared via Terraform state only; stress endpoint off by default; app reads secrets at runtime.
+- **Verification:**
+  - Target group: 2 healthy; instance refresh Successful (100%); instances InService/Healthy in us-east-1a and us-east-1b.
+  - `https://<cloudfront>/health` returns 200 `{"status":"ok","version":"1.0.1"}`, which proves the NAT path (package install), S3 endpoint download, Secrets Manager read and the DB connection plus migration.
+  - `/` and `/login` return 200; HTTP redirects 301 to HTTPS; `/api/stress` returns 404 with the flag off; `/media/<missing>` returns 403 (S3 via OAC, key absent).
+  - ALB DNS called directly from the internet gets no response (security group allows only the CloudFront prefix list), so the ALB cannot be reached except through CloudFront.
+- **Not yet verified:** browser flow (sign up with a real email code, sign in, post an item with photo, photo loads via `/media/...`, claim); to be done by Awwab and recorded.
+- **Screenshots to take** (blur account ID): `phase-2-site-home.png`, `phase-2-signup-confirm.png`, `phase-2-post-item.png`, `phase-2-item-with-photo.png`, `phase-2-alb-target-group-healthy.png`, `phase-2-asg-instances.png`, `phase-2-cloudfront-distribution.png`, `phase-2-ec2-instances-private.png` (no public IPs).

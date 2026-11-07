@@ -31,3 +31,9 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Construction: AI proposed a scoped inline policy with one documented `*` (KMS via SSM); human review: Awwab approved the plan (9 resources) unchanged
 - Operations: applied; test user signed up, confirmed, authenticated and was deleted via CLI; policy inspected for wildcards
 - Evidence screenshots: phase-7-cognito-pool.png, phase-7-cognito-client.png, phase-7-iam-role.png, phase-7-iam-policy-json.png, phase-7-ssm-param.png
+
+## Bolt 2 (+3b) — App, compute and CloudFront — 2026-11-08 PKT
+- Inception: Flask app, ASG/ALB, CloudFront with OAC and origin-verify header → docs/aidlc/phase-2-app-compute.md
+- Construction: AI proposed the app and stack (12 to add, 1 to change); human review: Awwab approved; two issues found during apply (ASG service-linked role delay, Windows zip backslashes) were diagnosed from instance logs and fixed with Awwab's approval of a second plan
+- Operations: 2 healthy instances behind ALB behind CloudFront; /health 200 through CloudFront, ALB unreachable directly, DB connection and migration proven; browser flow pending
+- Evidence screenshots: phase-2-site-home.png, phase-2-signup-confirm.png, phase-2-post-item.png, phase-2-item-with-photo.png, phase-2-alb-target-group-healthy.png, phase-2-asg-instances.png, phase-2-cloudfront-distribution.png, phase-2-ec2-instances-private.png
