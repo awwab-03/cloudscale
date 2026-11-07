@@ -26,13 +26,13 @@ Each phase is a bolt: Inception → Construction → Operations.
 - Operations: applied; verified available, private, single-AZ, encrypted, correct security group via AWS CLI
 - Evidence screenshots: phase-4-rds-config.png, phase-4-rds-connectivity.png, phase-4-secret.png
 
-## Bolt 7 — Cognito + EC2 IAM role — 2026-11-08 PKT
+## Bolt 7 — Cognito + EC2 IAM role — 2026-11-07 PKT
 - Inception: Cognito pool/client, SSM secret, least-privilege app role → docs/aidlc/phase-7-identity.md
 - Construction: AI proposed a scoped inline policy with one documented `*` (KMS via SSM); human review: Awwab approved the plan (9 resources) unchanged
 - Operations: applied; test user signed up, confirmed, authenticated and was deleted via CLI; policy inspected for wildcards
 - Evidence screenshots: phase-7-cognito-pool.png, phase-7-cognito-client.png, phase-7-iam-role.png, phase-7-iam-policy-json.png, phase-7-ssm-param.png
 
-## Bolt 2 (+3b) — App, compute and CloudFront — 2026-11-08 PKT
+## Bolt 2 (+3b) — App, compute and CloudFront — 2026-11-07 PKT
 - Inception: Flask app, ASG/ALB, CloudFront with OAC and origin-verify header → docs/aidlc/phase-2-app-compute.md
 - Construction: AI proposed the app and stack (12 to add, 1 to change); human review: Awwab approved; two issues found during apply (ASG service-linked role delay, Windows zip backslashes) were diagnosed from instance logs and fixed with Awwab's approval of a second plan
 - Operations: 2 healthy instances behind ALB behind CloudFront; /health 200 through CloudFront, ALB unreachable directly, DB connection and migration proven; browser flow pending

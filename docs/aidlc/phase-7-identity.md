@@ -39,7 +39,7 @@ Give the app a way for students to sign up and sign in (Cognito), and give the a
 
 ## Construction — approved plan
 `infra/identity.tf`: Cognito user pool + secretless app client, SSM SecureString `/cloudscale/app-secret-key` (random, state only), log group `/cloudscale/app`, role/instance profile `cloudscale-ec2-app` with a scoped inline policy and `AmazonSSMManagedInstanceCore`. Plan: 9 to add, 0 to change, 0 to destroy.
-Approved by Awwab Aamir, 2026-11-08.
+Approved by Awwab Aamir, 2026-11-07.
 
 ## Operations
 - **Built:** pool `cloudscale-users`, client `cloudscale-app`, SSM param, log group, `cloudscale-ec2-app` role + profile.

@@ -41,3 +41,7 @@ Two smart helpers in the "Post an item" form:
 
 ### Open questions
 - None.
+
+## Construction — approved plan (stage 1)
+`ml/make_seed.py` + `ml/data/seed_listings.csv` (400 rows), `ml/train.py`, `ml/launch_training.py`, `ml/deploy_endpoint.py`, `ml/delete_endpoint.py`, and Terraform role `cloudscale-sagemaker-exec` (`infra/ml.tf`). Plan: 2 to add, 0 to change, 0 to destroy. Local training check: holdout_accuracy 0.9875 on synthetic data.
+Approved by Awwab Aamir, 2026-11-07.
