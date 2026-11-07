@@ -16,6 +16,8 @@ COGNITO_CLIENT_ID = os.environ.get("COGNITO_CLIENT_ID", "")
 CLAIM_TOPIC_ARN = os.environ.get("CLAIM_TOPIC_ARN", "")
 SSM_PREFIX = os.environ.get("SSM_PREFIX", "/cloudscale")
 APP_VERSION = os.environ.get("APP_VERSION", "dev")
+SAGEMAKER_ENDPOINT = os.environ.get("SAGEMAKER_ENDPOINT", "")
+BEDROCK_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.amazon.nova-micro-v1:0")
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}

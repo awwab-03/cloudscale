@@ -29,6 +29,8 @@ COGNITO_POOL_ID=${cognito_pool_id}
 COGNITO_CLIENT_ID=${cognito_client_id}
 CLAIM_TOPIC_ARN=${claim_topic_arn}
 SSM_PREFIX=/cloudscale
+SAGEMAKER_ENDPOINT=cloudscale-category
+BEDROCK_MODEL_ID=us.amazon.nova-micro-v1:0
 ENVEOF
 chmod 600 /etc/cloudscale.env
 

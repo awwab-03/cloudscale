@@ -14,11 +14,17 @@
     <label>Quick notes</label>
     <input name="notes" maxlength="300" placeholder="e.g. black wallet, near library" value="{{ form.get('notes', '') }}">
     <label>Description</label>
-    <textarea name="description" rows="3">{{ form.get('description', '') }}</textarea>
+    <textarea name="description" id="description" rows="3">{{ form.get('description', '') }}</textarea>
+    <p><button type="button" id="btn-desc">Write description with AI</button>
+       <span class="muted" id="desc-status"></span></p>
     <label>Category</label>
-    <select name="category">
+    <select name="category" id="category">
       {% for c in categories %}<option {{ 'selected' if c == form.get('category') }}>{{ c }}</option>{% endfor %}
     </select>
+    <input type="hidden" name="ml_category" id="ml_category">
+    <input type="hidden" name="ml_confidence" id="ml_confidence">
+    <p><button type="button" id="btn-cat">Suggest category</button>
+       <span class="muted" id="cat-status"></span></p>
     <label>Location</label>
     <input name="location" maxlength="120" value="{{ form.get('location', '') }}">
     <label>Date</label>
@@ -28,4 +34,40 @@
     <p><button>Post</button></p>
   </form>
 </div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function payload() {
+    var f = document.querySelector('form');
+    return JSON.stringify({
+      kind: f.kind.value, title: f.title.value, notes: f.notes.value,
+      category: f.category.value, location: f.location.value
+    });
+  }
+  function call(url, statusEl, done) {
+    statusEl.textContent = 'Thinking...';
+    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload() })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) { statusEl.textContent = res.j.error || 'Something went wrong.'; return; }
+        done(res.j);
+      })
+      .catch(function () { statusEl.textContent = 'Network error, please try again.'; });
+  }
+  $('btn-cat').addEventListener('click', function () {
+    call('/api/suggest-category', $('cat-status'), function (j) {
+      $('category').value = j.category;
+      $('ml_category').value = j.category;
+      $('ml_confidence').value = j.confidence;
+      $('cat-status').textContent = 'Suggested: ' + j.category + ' (' + Math.round(j.confidence * 100) + '% sure)';
+    });
+  });
+  $('btn-desc').addEventListener('click', function () {
+    call('/api/write-description', $('desc-status'), function (j) {
+      $('description').value = j.description;
+      $('desc-status').textContent = 'Done. Edit it if you like.';
+    });
+  });
+})();
+</script>
 {% endblock %}

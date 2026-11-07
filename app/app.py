@@ -109,6 +109,56 @@ def logout():
     return redirect(url_for("index"))
 
 
+# ---------------------------------------------------------------- AI helpers
+def _json_login_required(view):
+    import functools
+
+    @functools.wraps(view)
+    def wrapper(*a, **kw):
+        if not auth.current_user():
+            return jsonify(error="Please sign in first."), 401
+        if not request.is_json:  # JSON-only, so cross-site form posts can't trigger it
+            return jsonify(error="JSON body required."), 415
+        return view(*a, **kw)
+
+    return wrapper
+
+
+@app.post("/api/suggest-category")
+@_json_login_required
+def api_suggest_category():
+    data = request.get_json(silent=True) or {}
+    title = str(data.get("title", "")).strip()[:200]
+    notes = str(data.get("notes", "")).strip()[:300]
+    if not (title or notes):
+        return jsonify(error="Enter a title or notes first."), 400
+    try:
+        result = aws_clients.predict_category(title, notes)
+        return jsonify(category=result["category"], confidence=result["confidence"])
+    except Exception as exc:
+        log.error("category prediction failed: %s", exc)
+        return jsonify(error="Category suggestion is unavailable right now."), 502
+
+
+@app.post("/api/write-description")
+@_json_login_required
+def api_write_description():
+    data = request.get_json(silent=True) or {}
+    title = str(data.get("title", "")).strip()[:200]
+    notes = str(data.get("notes", "")).strip()[:300]
+    if not (title or notes):
+        return jsonify(error="Enter a title or notes first."), 400
+    kind = "found" if data.get("kind") == "found" else "lost"
+    category = data.get("category") if data.get("category") in config.CATEGORIES else "Other"
+    try:
+        text = aws_clients.write_description(kind, title, notes, category,
+                                             str(data.get("location", ""))[:120])
+        return jsonify(description=text)
+    except Exception as exc:
+        log.error("description generation failed: %s", exc)
+        return jsonify(error="The description writer is unavailable right now."), 502
+
+
 # ---------------------------------------------------------------- items
 @app.get("/")
 def index():
@@ -143,6 +193,11 @@ def new_item():
             flash("Please choose lost/found and enter a title.", "error")
             return render_template("new_item.html", form=f)
         category = f.get("category") if f.get("category") in config.CATEGORIES else "Other"
+        ml_category = f.get("ml_category") if f.get("ml_category") in config.CATEGORIES else None
+        try:
+            ml_conf = min(max(float(f.get("ml_confidence", "")), 0.0), 1.0) if ml_category else None
+        except ValueError:
+            ml_conf = None
         try:
             key = aws_clients.upload_photo(request.files.get("photo"))
         except ValueError as exc:
@@ -151,11 +206,12 @@ def new_item():
         with db.get_conn() as conn:
             row = conn.execute(
                 """INSERT INTO items (owner_sub, kind, title, notes, description, category,
-                                      location, item_date, image_key)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, NULLIF(%s, '')::date, %s) RETURNING id""",
+                                      ml_category, ml_confidence, location, item_date, image_key)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NULLIF(%s, '')::date, %s)
+                   RETURNING id""",
                 (auth.current_user()["sub"], kind, title, f.get("notes", "").strip(),
-                 f.get("description", "").strip(), category, f.get("location", "").strip(),
-                 f.get("item_date", ""), key),
+                 f.get("description", "").strip(), category, ml_category, ml_conf,
+                 f.get("location", "").strip(), f.get("item_date", ""), key),
             ).fetchone()
         flash("Item posted.", "ok")
         return redirect(url_for("item_detail", item_id=row["id"]))

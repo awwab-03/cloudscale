@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -13,6 +14,8 @@ log = logging.getLogger("cloudscale.aws")
 _s3 = None
 _sns = None
 _cognito = None
+_sm_runtime = None
+_bedrock = None
 
 
 def s3():
@@ -90,3 +93,50 @@ def publish_claim(owner_email, item_title, claimant_name, message):
         )
     except Exception as exc:
         log.warning("SNS publish skipped: %s", exc)
+
+
+def sm_runtime():
+    global _sm_runtime
+    if _sm_runtime is None:
+        _sm_runtime = boto3.client("sagemaker-runtime", region_name=config.REGION)
+    return _sm_runtime
+
+
+def bedrock():
+    global _bedrock
+    if _bedrock is None:
+        _bedrock = boto3.client("bedrock-runtime", region_name=config.REGION)
+    return _bedrock
+
+
+def predict_category(title, notes):
+    """SageMaker serverless endpoint (our own TF-IDF + LogisticRegression model)."""
+    resp = sm_runtime().invoke_endpoint(
+        EndpointName=config.SAGEMAKER_ENDPOINT,
+        ContentType="application/json",
+        Body=json.dumps({"title": title, "notes": notes}),
+    )
+    return json.loads(resp["Body"].read())[0]
+
+
+DESCRIPTION_SYSTEM = (
+    "You write short, clear descriptions for a campus lost-and-found listing. "
+    "Write 2 to 3 plain sentences. Use only the facts given, do not invent details such as "
+    "brands, colours or contents, and never include phone numbers or other contact details."
+)
+
+
+def write_description(kind, title, notes, category, location):
+    """Bedrock Converse API (Amazon Nova Micro): turn terse notes into a listing description."""
+    prompt = (
+        f"Listing type: {kind}\nTitle: {title}\nCategory: {category}\n"
+        f"Location: {location or 'not given'}\nNotes: {notes or 'none'}\n\n"
+        "Write the description."
+    )
+    resp = bedrock().converse(
+        modelId=config.BEDROCK_MODEL_ID,
+        system=[{"text": DESCRIPTION_SYSTEM}],
+        messages=[{"role": "user", "content": [{"text": prompt}]}],
+        inferenceConfig={"maxTokens": 200, "temperature": 0.3},
+    )
+    return resp["output"]["message"]["content"][0]["text"].strip()
