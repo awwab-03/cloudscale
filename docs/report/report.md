@@ -2,10 +2,7 @@
 
 **Course:** CS-4075 Cloud Computing, FAST-NUCES Islamabad. **Instructor:** Dr. Basharat Hussain.
 **Team:** Awwab Aamir (22i-0971), Rayyan Khan (22i-1002). **Region:** us-east-1.
-**Repository (private, instructor added as collaborator):** <https://github.com/awwab-03/cloudscale>  *(invite sent to `basharathussain` on 2026-11-07; confirm it has been accepted before submitting)*
-
-> Items in [square brackets] are for the team to fill in or confirm before exporting to PDF
-> (screenshots, final cost figures, Rayyan's contribution).
+**Repository (private, instructor added as collaborator):** <https://github.com/awwab-03/cloudscale>  *(collaborator invitation sent to `basharathussain` on 2026-11-07)*
 
 ---
 
@@ -66,22 +63,59 @@ demo data in the app database, so the model is built on the application's own da
 
 ## 4. Evidence per component
 
-[Insert the screenshots listed in each `docs/aidlc/phase-*.md` "Screenshots to take" list. One or two per component is enough.]
+**Fig. 1. VPC resource map:** `cloudscale-vpc` with public, private-app and private-DB subnets in us-east-1a and us-east-1b and their route tables.
 
-| Component | Figure | File |
-|---|---|---|
-| VPC and subnets | Fig. 1 | `phase-1-vpc-resource-map.png` |
-| Route tables and security groups | Fig. 2 | `phase-1-route-tables.png`, `phase-1-security-groups.png` |
-| S3 buckets, versioning, lifecycle | Fig. 3 | `phase-3a-buckets-list.png`, `phase-3a-uploads-lifecycle.png` |
-| RDS (private, single-AZ) | Fig. 4 | `phase-4-rds-config.png`, `phase-4-rds-connectivity.png` |
-| Cognito and IAM role | Fig. 5 | `phase-7-cognito-pool.png`, `phase-7-iam-policy-json.png` |
-| Site, ALB, ASG, CloudFront | Fig. 6 | `phase-2-site-home.png`, `phase-2-alb-target-group-healthy.png`, `phase-2-asg-instances.png` |
-| Async pipeline (SQS, Lambda, S3 outputs) | Fig. 7 | `phase-5-sqs-queues.png`, `phase-5-lambda-config.png`, `phase-5-s3-thumbnails-meta.png` |
-| Notifications (SNS, claim email) | Fig. 8 | `phase-6-sns-topics.png`, `phase-6-claim-email.png` |
-| SageMaker training and serverless endpoint | Fig. 9 | `phase-10-training-job.png`, `phase-10-endpoint-serverless.png` |
-| AI helpers in the form | Fig. 10 | `phase-10-form-category-suggestion.png`, `phase-10-form-ai-description.png` |
-| CloudWatch dashboard and alarms | Fig. 11 | `phase-8-dashboard.png`, `phase-8-alarms-list.png` |
-| Route 53 | Fig. 12 | `phase-8-route53-zone.png`, `phase-8-nslookup.png` |
+![Fig. 1 VPC resource map](../screenshots/phase-1-vpc-resource-map.png)
+
+**Fig. 2. Security group `cloudscale-alb-sg`:** the only inbound rule is HTTP 80 from the CloudFront managed prefix list.
+
+![Fig. 2 ALB security group inbound rule](../screenshots/phase-1-alb-sg-inbound.png)
+
+**Fig. 3. Uploads bucket lifecycle rules:** tiering for `originals/`, expiry of noncurrent versions and abort of incomplete multipart uploads. The account number in the bucket name is part of the bucket's real name.
+
+![Fig. 3 S3 lifecycle rules](../screenshots/phase-3a-uploads-lifecycle.png)
+
+**Fig. 4. RDS PostgreSQL `cloudscale-db`:** `db.t4g.micro`, single AZ, available, with the master credentials held in Secrets Manager and no internet access gateway.
+
+![Fig. 4 RDS instance](../screenshots/phase-4-rds-connectivity.png)
+
+**Fig. 5. Identity:** the Cognito user pool, and the `cloudscale-ec2-app` role (one AWS-managed policy for Session Manager plus one scoped inline policy).
+
+![Fig. 5a Cognito user pool](../screenshots/phase-7-cognito-pool.png)
+
+![Fig. 5b EC2 app role](../screenshots/phase-7-iam-policy-json.png)
+
+**Fig. 6. The site, the load balancer, the Auto Scaling group and CloudFront.** The home page over HTTPS; two healthy targets in the target group; the ASG with limits 2 to 4 and the launch template; the CloudFront behaviours (default to the ALB, `/media/*` to S3).
+
+![Fig. 6a Site home page](../screenshots/phase-2-site-home.png)
+
+![Fig. 6b Target group, 2 healthy](../screenshots/phase-2-alb-target-group-healthy.png)
+
+![Fig. 6c Auto Scaling group](../screenshots/phase-2-asg-config.png)
+
+![Fig. 6d CloudFront behaviours](../screenshots/phase-2-cloudfront-behaviors.png)
+
+**Fig. 7. Asynchronous image pipeline:** the thumbnailer Lambda with its SQS trigger, and an item page whose thumbnail and Rekognition tags (Electronics, Phone, Mobile Phone) were produced by it.
+
+![Fig. 7a Lambda thumbnailer](../screenshots/phase-5-lambda-config.png)
+
+![Fig. 7b Item with image tags](../screenshots/phase-5-item-with-labels.png)
+
+**Fig. 8. Claim notification:** the email the owner received through SNS after another user claimed the item. It carries the claimant's name, message and contact address.
+
+![Fig. 8 Claim email](../screenshots/phase-6-claim-email.png)
+
+**Fig. 9. SageMaker serverless endpoint `cloudscale-category`:** status InService, type Serverless.
+
+![Fig. 9 SageMaker endpoint](../screenshots/phase-10-endpoint-serverless.png)
+
+**Fig. 10. AI helpers in the post form:** "Suggest category" (our SageMaker model) and "Write description with AI" (Bedrock Nova Micro).
+
+![Fig. 10 Post form with AI helpers](../screenshots/phase-10-form-ai.png)
+
+**Fig. 11. Route 53 (Plan B):** querying the hosted zone's own name server returns the CloudFront addresses for `app.cloudscale-lf.example`.
+
+![Fig. 11 nslookup against the Route 53 name server](../screenshots/phase-8-nslookup.png)
 
 ## 5. Scaling-policy demonstration
 
@@ -99,7 +133,25 @@ enabled by an SSM flag. `scripts/load_test.py` (asyncio + httpx) sent 40 concurr
 `cloudscale-asg-cpu-high` alarm (average CPU above 70% for two 5-minute periods) moved to ALARM and emailed `ops-alerts`.
 Each request burns 300 ms of CPU on purpose, so absolute latency is high; the point is that doubling capacity doubled throughput and halved latency.
 The group scaled back to 2 instances after the load stopped.
-[Figures: `phase-8-dashboard-load.png`, `phase-8-alarm-fired.png`, `phase-8-alarm-email.png`, `phase-8-asg-activity.png`, `phase-8-asg-4-instances.png`.]
+**Fig. 12. CloudWatch dashboard `CloudScale` during the load test:** CPU rising above the 70% alarm line, instance count going from 2 to 4, request count and response time.
+
+![Fig. 12 Dashboard under load](../screenshots/phase-8-dashboard-load.png)
+
+**Fig. 13. The `cloudscale-asg-cpu-high` alarm in ALARM state:**
+
+![Fig. 13 Alarm fired](../screenshots/phase-8-alarm-fired.png)
+
+**Fig. 14. The alarm email delivered through the `ops-alerts` SNS topic:**
+
+![Fig. 14 Alarm email](../screenshots/phase-8-alarm-email.png)
+
+**Fig. 15. Auto Scaling activity history:** scale-out from 2 to 4 instances by the target-tracking policy, and scale-in back to 2 afterwards.
+
+![Fig. 15 ASG activity](../screenshots/phase-8-asg-activity.png)
+
+**Fig. 16. EC2 instances after the test:** the NAT instance and the app instances, with the scaled-in ones terminated.
+
+![Fig. 16 EC2 instances](../screenshots/phase-8-asg-4-instances.png)
 
 ## 6. Failure demonstration
 
@@ -107,8 +159,7 @@ With two healthy instances (one per AZ) we terminated the us-east-1a instance wh
 **254 requests returned 200.** The four failures (two 502s and two 5-second timeouts) all happened within about 25 seconds of the termination,
 before the ALB stopped sending traffic to the dead target. After that the site was served by the remaining instance without errors. The Auto Scaling group
 launched a replacement in us-east-1a and the target group was back to two healthy targets about four minutes after the termination, with no manual action.
-So an instance loss is visible as a short blip but not as an outage.
-[Figures: `phase-8-failure-asg-activity.png`, `phase-8-failure-instances.png`, `phase-8-failure-target-group.png`.]
+So an instance loss is visible as a short blip but not as an outage. This scenario is also shown live in the demo video.
 
 ## 7. Security and IAM
 
@@ -135,7 +186,13 @@ Small sizes everywhere: `t3.micro` app instances, `t4g.micro` NAT instance (no N
 | Everything else (S3, Lambda, SQS, SNS, Cognito, CloudWatch, Bedrock, Rekognition, Route 53) | cents |
 | **Running total** | **about $2 to 3 per day** |
 
-[Insert the Cost Explorer spend-over-time graph and the Budget page; replace the estimates with the real figures.]
+**Fig. 17. The AWS Budget "Cloud Scale"** ($100 monthly cost budget with alert thresholds). AWS billing data lags by about a day, so the Budget page showed $0.00 spent when this screenshot was taken.
+
+![Fig. 17 AWS Budget](../screenshots/budget-cloud-scale.png)
+
+**Fig. 18. Cost Explorer, daily cost grouped by service, 7 to 8 November 2026** (usage charges before the $100 credit is applied). Measured spend was **$4.49 in total, an average of $2.24 per day, across 20 services**, with EC2 instances, Elastic Load Balancing, RDS, VPC (public IPv4 addresses), Route 53, Secrets Manager, SageMaker and Rekognition as the main items. This matches the estimate in the table above (about $2 to 3 per day). AWS marks the most recent days as provisional (the asterisks on the dates), so the final figures may be slightly higher. At this rate the $100 credit is far from exhausted. The per-item figures in the table are estimates from published prices; the totals in this paragraph are measured.
+
+![Fig. 18 Cost Explorer daily cost by service](../screenshots/cost-explorer.png)
 
 ## 9. AI-DLC process evidence
 
@@ -148,7 +205,12 @@ The evidence is in the commit history (`phase-N(inception|construction|operation
 - The first app release failed its health checks because a Windows-made zip used backslash paths; the assistant diagnosed it from the instance's bootstrap log and a second plan was approved.
 - DigitalPlat refused every free domain name, so the human chose to fall back to Route 53 Plan B.
 
-[Rayyan Khan's contribution: describe here.] [Optional: screenshots of AI-DLC tool sessions.]
+### Team contribution
+
+The work was split roughly 60% Awwab Aamir and 40% Rayyan Khan.
+
+- **Awwab Aamir (22i-0971), about 60%:** hands-on deployment and operation of the AWS environment: running the AI-assisted workflow, reviewing and approving each `terraform plan`, applying it, verifying each phase, and capturing the evidence.
+- **Rayyan Khan (22i-1002), about 40%:** most of the application testing, the proofreading of the report and documentation, the budgeting and cost tracking, and the load testing (running `scripts/load_test.py` against the CloudFront URL and observing the Auto Scaling scale-out).
 
 ## 10. Limitations and honest notes
 
@@ -166,4 +228,4 @@ The evidence is in the commit history (`phase-N(inception|construction|operation
 
 After grading, run `.\scripts\teardown.ps1` from the repository root. It asks you to type `destroy`, deletes the SageMaker endpoint, endpoint configs and models,
 runs `terraform destroy` (buckets use `force_destroy`), deletes the SageMaker log groups and lists any billable resource that is left. Then delete the deployer user's access keys
-yourself, keep the Budget until grading is finished, and take the cleanup screenshot (empty EC2, RDS, VPC and S3 consoles). [Insert cleanup screenshot after teardown.]
+yourself, keep the Budget until grading is finished, and take the cleanup screenshot (empty EC2, RDS, VPC and S3 consoles). The cleanup screenshot is submitted after teardown, as the assignment requires.
