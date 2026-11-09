@@ -194,6 +194,10 @@ Small sizes everywhere: `t3.micro` app instances, `t4g.micro` NAT instance (no N
 
 ![Fig. 18 Cost Explorer daily cost by service](../screenshots/cost-explorer.png)
 
+**Fig. 19. Budget alert recipients verified.** Both alert recipients (`awwabcms@gmail.com` and `i220971@nu.edu.pk`) show as Verified, so the 50% and 80% actual-cost alerts and the 100% forecasted-cost alert can be delivered. The budget health status is Healthy.
+
+![Fig. 19 Budget email verification](../screenshots/budget-alerts-verified.png)
+
 ## 9. AI-DLC process evidence
 
 The project followed the AI-Driven Development Lifecycle. For every phase the AI assistant (1) wrote an Inception document (goal, requirements, acceptance criteria, open questions)
