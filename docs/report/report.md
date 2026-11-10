@@ -2,7 +2,7 @@
 
 **Course:** CS-4075 Cloud Computing, FAST-NUCES Islamabad. **Instructor:** Dr. Basharat Hussain.
 **Team:** Awwab Aamir (22i-0971), Rayyan Khan (22i-1002). **Region:** us-east-1.
-**Repository (private, instructor added as collaborator):** <https://github.com/awwab-03/cloudscale>  *(collaborator invitation sent to `basharathussain` on 2026-11-07)*
+**Repository (private, TA/evaluator added as collaborator):** <https://github.com/awwab-03/cloudscale>  *(collaborator: `Abdul-Moeez4`, invitation accepted)*
 
 ---
 
