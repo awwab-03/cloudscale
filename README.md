@@ -34,7 +34,8 @@ app/        Flask app: app.py config.py db.py auth.py aws_clients.py seed_db.py,
 lambda/     thumbnailer/handler.py (Pillow + Rekognition)
 ml/         make_seed.py, data/seed_listings.csv, train.py, launch_training.py, deploy_endpoint.py, delete_endpoint.py
 scripts/    package_app.ps1  build_lambda.ps1  load_test.py  teardown.ps1
-docs/       aidlc/ (one file per phase), iam-justification.md, architecture.png, screenshots/, report/
+tests/      unit tests for app config (python -m unittest discover tests)
+docs/       aidlc/ (one file per phase), configuration.md, troubleshooting.md, iam-justification.md, architecture.png, screenshots/, report/
 AI-DLC-LOG.md   one entry per bolt (Inception, Construction with human review, Operations)
 CLAUDE.md       project brief given to the AI assistant
 ```
